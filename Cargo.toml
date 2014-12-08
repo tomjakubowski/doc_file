@@ -1,0 +1,10 @@
+[package]
+
+name = "doc_file"
+version = "0.0.1"
+authors = ["Tom Jakubowski <tom@crystae.net>"]
+
+[lib]
+name = "doc_file"
+path = "src/lib.rs"
+plugin = true
