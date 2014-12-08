@@ -1,4 +1,4 @@
-#![feature(if_let, phase, plugin_registrar)]
+#![feature(phase, plugin_registrar)]
 
 extern crate rustc;
 extern crate syntax;
@@ -6,7 +6,7 @@ extern crate syntax;
 #[phase(plugin, link)] extern crate log;
 
 use rustc::plugin::Registry;
-use syntax::ast::{Attribute, Attribute_, Item, MetaItem};
+use syntax::ast::{Attribute, Item, MetaItem};
 use syntax::ext::base::{ExtCtxt, ItemModifier, SyntaxExtension};
 use syntax::codemap::Span;
 use syntax::parse::token;
