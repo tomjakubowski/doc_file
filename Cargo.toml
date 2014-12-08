@@ -8,3 +8,4 @@ authors = ["Tom Jakubowski <tom@crystae.net>"]
 name = "doc_file"
 path = "src/lib.rs"
 plugin = true
+doc = false
