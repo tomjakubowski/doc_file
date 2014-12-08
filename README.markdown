@@ -6,7 +6,7 @@ Move your Rust crate's documentation into external files.
 
 ## Why?
 
-This is a proof of concept implementation of [rust-lang/rust#115470][issue].
+This is a proof of concept implementation of [rust-lang/rust#15470][issue].
 I hope to iron out questions and discover issues out of tree and then
 contribute this back to `rustc` itself.
 
