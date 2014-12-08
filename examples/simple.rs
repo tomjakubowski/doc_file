@@ -6,3 +6,6 @@
 
 #[doc_file = "complicated_thing.markdown"]
 pub struct ComplicatedThing;
+
+fn main() {
+}
