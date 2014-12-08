@@ -4,6 +4,14 @@ name = "doc_file"
 version = "0.0.1"
 authors = ["Tom Jakubowski <tom@crystae.net>"]
 
+description = """
+Move your Rust crate's documentation into external files.
+"""
+keywords = ["plugin"]
+license = "MIT"
+repository = "https://github.com/tomjakubowski/doc_file"
+readme = "README.markdown"
+
 [lib]
 name = "doc_file"
 path = "src/lib.rs"
