@@ -76,25 +76,24 @@ fn expand_attr_(cx: &mut ExtCtxt, sp: Span, meta: &MetaItem,
 
 fn expand_attr(cx: &mut ExtCtxt, sp: Span, meta: &MetaItem,
                item: P<Item>) -> P<Item> {
-    use syntax::ptr::P;
-
-    let mut item = item.and_then(|x| x); // unwrap the item
-    if let Err(e) = expand_attr_(cx, sp, meta, &mut item.attrs) {
-        match e {
-            AttrError::Path => {
-                cx.span_err(sp, "Invalid path in doc_file attribute");
-            }
-            AttrError::Syntax => {
-                cx.span_err(sp, "Invalid use of doc_file attribute, use like: \
-                            `#[doc_file = \"foo.markdown\"]`");
-            }
-            AttrError::IoError(e) => {
-                let msg = format!("IO error reading doc_file attribute: {}", e);
-                cx.span_err(sp, msg.as_slice());
-            }
+    item.map(|mut item| {
+        if let Err(e) = expand_attr_(cx, sp, meta, &mut item.attrs) {
+            match e {
+                AttrError::Path => {
+                    cx.span_err(sp, "Invalid path in doc_file attribute");
+                }
+                AttrError::Syntax => {
+                    cx.span_err(sp, "Invalid use of doc_file attribute, use like: \
+                                `#[doc_file = \"foo.markdown\"]`");
+                }
+                AttrError::IoError(e) => {
+                    let msg = format!("IO error reading doc_file attribute: {}", e);
+                    cx.span_err(sp, msg.as_slice());
+                }
+            };
         };
-    };
-    P(item)
+        item
+    })
 }
 
 #[plugin_registrar]
