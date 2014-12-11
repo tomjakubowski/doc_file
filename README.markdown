@@ -16,18 +16,16 @@ contribute this back to `rustc` itself.
 #![feature(phase)]
 
 // Paths are relative to the source file.
-#![doc_file = "example_crate.markdown"]
+#![doc(file="example_crate.markdown")]
 
 #[phase(plugin)] extern crate doc_file;
 
-#[doc_file = "complicated_thing.markdown"]
+#[doc(file="complicated_thing.markdown")]
 pub struct ComplicatedThing;
+
+/// Document other items like usual
+pub struct SimpleThing;
 ```
-
-## Open issues
-
-The syntax `#[doc_file = "..."]` is a little ugly.  Ideally it would be
-something like `#[doc(file = "...")]`.
 
 [travis]: https://travis-ci.org/tomjakubowski/doc_file
 [travis-img]: https://travis-ci.org/tomjakubowski/doc_file.svg
