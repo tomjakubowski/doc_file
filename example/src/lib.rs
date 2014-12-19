@@ -1,5 +1,5 @@
 #![feature(phase)]
-#![doc = "foo" ]
+#![doc_file="essay.md"]
 
 #[phase(plugin)] extern crate doc_file;
 

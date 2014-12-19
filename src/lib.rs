@@ -17,8 +17,8 @@ use std::io::{mod, IoResult};
 
 enum AttrError {
     IoError(io::IoError),
-    Path(Span),
-    Syntax(Span)
+    Path,
+    Syntax
 }
 
 impl FromError<io::IoError> for AttrError {
@@ -27,35 +27,20 @@ impl FromError<io::IoError> for AttrError {
     }
 }
 
-fn extract_doc_path(meta: &MetaItem) -> Option<Result<Path, AttrError>> {
+fn extract_doc_path(meta: &MetaItem) -> Result<Path, AttrError> {
     use syntax::ast::MetaItem_::MetaNameValue as NameValue;
-    use syntax::ast::MetaItem_::MetaList as List;
     use syntax::ast::Lit_::LitStr;
 
     match meta.node {
-        List(_, ref vec) => {
-            let mut found = None;
-            for item in vec.iter() {
-                if let NameValue(ref name, ref lit) = item.node {
-                    if *name == "file" {
-                        found = Some(lit.clone())
-                    }
-                }
-            }
-            let lit = match found {
-                Some(l) => l,
-                None => return None
-            };
+        NameValue(_, ref lit) => {
             match lit.node {
                 LitStr(ref path, _) => {
-                    let path = Path::new_opt(path);
-                    let res: Result<Path, _> = path.ok_or(AttrError::Path(lit.span));
-                    Some(res)
+                    Path::new_opt(path).ok_or(AttrError::Path)
                 },
-                _ => Some(Err(AttrError::Syntax(lit.span)))
+                _ => Err(AttrError::Syntax)
             }
         },
-        _ => None
+        _ => Err(AttrError::Syntax)
     }
 }
 
@@ -80,11 +65,7 @@ fn mk_doc_attr(doc_string: String) -> Attribute {
 fn expand_attr_(cx: &mut ExtCtxt, sp: Span, meta: &MetaItem,
                 attrs: &mut Vec<Attribute>) -> Result<(), AttrError> {
 
-    let path = extract_doc_path(meta);
-    let path = match path {
-        Some(res) => try!(res),
-        None => return Ok(())
-    };
+    let path = try!(extract_doc_path(meta));
     let doc_string = try!(slurp_doc_file(cx, path, sp));
 
     let attr = mk_doc_attr(doc_string);
@@ -98,16 +79,16 @@ fn expand_attr(cx: &mut ExtCtxt, sp: Span, meta: &MetaItem,
     item.map(|mut item| {
         if let Err(e) = expand_attr_(cx, sp, meta, &mut item.attrs) {
             match e {
-                AttrError::Path(sp) => {
-                    cx.span_err(sp, "invalid NUL character in path");
+                AttrError::Path => {
+                    cx.span_err(sp, "Invalid path in doc_file attribute");
                 }
-                // This error is actually unreachable, because non-string literals
-                // aren't allowed in meta-items
-                AttrError::Syntax(sp) => {
-                    cx.span_bug(sp, "used non-string literal in meta-item");
+                AttrError::Syntax => {
+                    cx.span_err(sp, "Invalid use of doc_file attribute, use like: \
+                                `#[doc_file = \"foo.markdown\"]`");
                 }
                 AttrError::IoError(e) => {
-                    cx.span_err(sp, format!("couldn't read doc file: {}", e).as_slice());
+                    let msg = format!("IO error reading doc_file attribute: {}", e);
+                    cx.span_err(sp, msg.as_slice());
                 }
             };
         };
@@ -118,6 +99,6 @@ fn expand_attr(cx: &mut ExtCtxt, sp: Span, meta: &MetaItem,
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
     let modifier = box expand_attr as Box<ItemModifier>;
-    reg.register_syntax_extension(token::intern("doc"),
+    reg.register_syntax_extension(token::intern("doc_file"),
                                   SyntaxExtension::Modifier(modifier));
 }
