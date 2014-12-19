@@ -1,0 +1,8 @@
+[package]
+
+name = "example"
+version = "0.0.1"
+authors = ["Tom Jakubowski <tom@crystae.net>"]
+
+[dependencies.doc_file]
+path = "../"
